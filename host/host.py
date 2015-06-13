@@ -2,11 +2,11 @@ import numpy as np
 import pylab
 
 # Off = 0, Error = 1, Warning = 2, Verbose = 3, VeryVerbose = 4
-max_debug_level = 4
+max_debug_level = 2
 np.set_printoptions(threshold=1000000)
 
 
-file = "/home/juri/useless/arduino_dump.raw"
+file = "../sample.dat"
 data = np.fromfile(file, dtype=np.uint8)
 
 def debug( *args, debuglevel=4):
@@ -46,7 +46,7 @@ def findIndex( data, ind=0 ):
 def fillDataPoints( data, start=0, end=data.size ):
 	debug("fillDataPoints( ", data, start, end, " )")
 	startIndex = findIndex( data, start )
-	print( startIndex )
+	debug("startIndex( ", startIndex, " )", debuglevel=3)
 	maxvalue = (end - startIndex)//4
 	data_r = data[startIndex:startIndex+4*maxvalue].reshape((-1,4))
 
