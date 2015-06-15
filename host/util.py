@@ -12,15 +12,20 @@ def debug( *args, debuglevel=4):
 def xor( array ):
 	debug("xor( ", array, " )", debuglevel=4)
 	a = array
-	base = a[0]^a[1]^a[2]^a[3]
-	_xor = (base>>4)^(base&15)
-	debug(_xor)
+	try:
+		base = a[0]^a[1]^a[2]^a[3]
+		_xor = (base>>4)^(base&15)
+	except IndexError:
+		debug("[ERROR]: XOR out of bounds", debuglevel=1)
+		_xor = 1 # In case of error, return _xor != 0
+	debug("_xor ", _xor, debuglevel=3)
 	return _xor
 
-def sumXor( data, index=0, steps=1000 ):
+def sumXor( data, index=0, steps=500 ):
 	debug("sumXor( ", data, index, steps, " )", debuglevel=4)
 	sum_xor = 0
-	for i in range( index, index+steps, 4):
+	last = min(index+steps, data.size)
+	for i in range( index, last, 4):
 		_xor = xor( data[i:i+4] )
 		sum_xor += _xor
 	debug( sum_xor )
@@ -39,6 +44,7 @@ def findIndex( data, ind=0 ):
 	debug( ind , debuglevel=3)
 	return ind
 
+#@profile
 def fillDataPoints( data, start=0, end=0, time_ovf_count=0 ):
 	if( end == 0 ):
 		end=data.size
@@ -69,7 +75,7 @@ def fillDataPoints( data, start=0, end=0, time_ovf_count=0 ):
 			flag0[i] = data_r[i,3]&(1<<5)
 			flag1[i] = data_r[i,3]&(1<<4)
 		elif fails > maxfails:
-			debug("[ERROR] Index lost on pos ", i, ", recounting.", debuglevel = 2)
+			debug("[ERROR] Index lost on pos ", i, ", recounting.", debuglevel = 1)
 			i = findIndex( data, i )
 			debug("\t New pos: ", i, debuglevel = 2)
 			fails = 0
