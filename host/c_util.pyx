@@ -1,4 +1,8 @@
+# cython: profile=True
+
 import numpy as np
+cimport numpy as np
+cimport cython
 
 # Off = 0, Error = 1, Warning = 2, Verbose = 3, VeryVerbose = 4
 max_debug_level = 2
@@ -9,7 +13,9 @@ def debug( *args, debuglevel=4):
 	if debuglevel <= max_debug_level:
 		print( args )
 
-def xor( array ):
+cdef int xor( np.ndarray array ) except? 1:
+	cdef int base, _xor
+	cdef np.ndarray a
 	debug("xor( ", array, " )", debuglevel=4)
 	a = array
 	try:
@@ -21,7 +27,8 @@ def xor( array ):
 	debug("_xor ", _xor, debuglevel=3)
 	return _xor
 
-def sumXor( data, index=0, steps=500 ):
+cdef int sumXor( np.ndarray data, int index=0, int steps=500 ):
+	cdef int sum_xor, _xor, last, i
 	debug("sumXor( ", data, index, steps, " )", debuglevel=4)
 	sum_xor = 0
 	last = min(index+steps, data.size)
@@ -32,7 +39,7 @@ def sumXor( data, index=0, steps=500 ):
 	return sum_xor
 
 
-def findIndex( data, ind=0 ):
+cpdef int findIndex( np.ndarray data, int ind=0 ):
 	debug("findIndex( ", data, ind, " )", debuglevel=4)
 	indexFound = False
 	
@@ -45,7 +52,13 @@ def findIndex( data, ind=0 ):
 	return ind
 
 #@profile
-def fillDataPoints( data, start=0, end=0, time_ovf_count=0 ):
+@cython.boundscheck(False)
+def fillDataPoints( np.ndarray[np.uint8_t, ndim=1] data, int start=0, int end=0, int time_ovf_count=0 ):
+	cdef int maxvalue, maxfails, fails, i, orig_time
+	cdef np.ndarray[np.uint8_t, ndim=2] data_r
+	cdef np.ndarray[np.uint32_t, ndim=1] timestamp
+	cdef np.ndarray[np.uint16_t, ndim=1] value
+	cdef np.ndarray[np.uint8_t, ndim=1] flag0, flag1
 	if( end == 0 ):
 		end=data.size
 	

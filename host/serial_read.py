@@ -9,7 +9,7 @@ outfile = "../chunk.npy"
 
 ser = serial.Serial()
 
-ser.port = '/dev/ttyACM1'
+ser.port = '/dev/ttyACM0'
 ser.baudrate = 500000
 ser.open()
 
@@ -17,6 +17,19 @@ def read(size, skip=0):
 	ser.read(skip)
 	return np.frombuffer( ser.read(size), dtype=np.uint8 )
 
+def async_read(pipe, size):
+	try:
+		while(True):
+			pipe.send( np.frombuffer(ser.read(size), dtype=np.uint8) )
+			skip = pipe.recv()
+			ser.read(skip)
+			if( not skip == 0 ):
+				print("Skipped ", skip)
+			
+	except SystemExit:
+		pipe.close()
+		ser.close()
+	
 atexit.register(ser.close)
 
 # Stand-alone behaviour
