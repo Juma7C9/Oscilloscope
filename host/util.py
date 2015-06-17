@@ -1,13 +1,13 @@
 import numpy as np
 
-# Off = 0, Error = 1, Warning = 2, Verbose = 3, VeryVerbose = 4
-max_debug_level = 2
+# Off = 0, Error = 1, Warning = 2, Verbose = 3, VeryVerbose = 4, VeryVeryVerbose = 5
+max_debug_level = 3
 np.set_printoptions(threshold=1000000)
 
 
 def debug( *args, debuglevel=4):
 	if debuglevel <= max_debug_level:
-		print( args )
+		print( *args )
 
 def xor( array ):
 	debug("xor( ", array, " )", debuglevel=4)

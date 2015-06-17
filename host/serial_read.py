@@ -2,6 +2,8 @@ import numpy as np
 import serial
 import atexit
 
+from util import debug
+
 chunk_size = 1000
 
 data = np.zeros((chunk_size), dtype=np.uint8)
@@ -24,7 +26,7 @@ def async_read(pipe, size):
 			skip = pipe.recv()
 			ser.read(skip)
 			if( not skip == 0 ):
-				print("Skipped ", skip)
+				debug("Skipped ", skip, debuglevel=3)
 			
 	except SystemExit:
 		pipe.close()

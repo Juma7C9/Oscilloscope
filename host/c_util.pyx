@@ -1,22 +1,24 @@
-# cython: profile=True
+## cython: profile=True
 
 import numpy as np
 cimport numpy as np
 cimport cython
 
-# Off = 0, Error = 1, Warning = 2, Verbose = 3, VeryVerbose = 4
-max_debug_level = 2
-np.set_printoptions(threshold=1000000)
+from util import debug
+
+## Off = 0, Error = 1, Warning = 2, Verbose = 3, VeryVerbose = 4
+#max_debug_level = 3
+#np.set_printoptions(threshold=1000000)
 
 
-def debug( *args, debuglevel=4):
-	if debuglevel <= max_debug_level:
-		print( args )
+#def debug( *args, debuglevel=4):
+#	if debuglevel <= max_debug_level:
+#		print( args )
 
-cdef int xor( np.ndarray array ) except? 1:
+cdef int xor( np.ndarray[np.uint8_t, ndim=1] array ) except? 1:
 	cdef int base, _xor
-	cdef np.ndarray a
-	debug("xor( ", array, " )", debuglevel=4)
+	cdef np.ndarray[np.uint8_t, ndim=1] a
+	debug("xor( ", array, " )", debuglevel=5)
 	a = array
 	try:
 		base = a[0]^a[1]^a[2]^a[3]
@@ -24,12 +26,12 @@ cdef int xor( np.ndarray array ) except? 1:
 	except IndexError:
 		debug("[ERROR]: XOR out of bounds", debuglevel=1)
 		_xor = 1 # In case of error, return _xor != 0
-	debug("_xor ", _xor, debuglevel=3)
+	debug("_xor ", _xor, debuglevel=4)
 	return _xor
 
-cdef int sumXor( np.ndarray data, int index=0, int steps=500 ):
+cdef int sumXor( np.ndarray[np.uint8_t, ndim=1] data, int index=0, int steps=500 ):
 	cdef int sum_xor, _xor, last, i
-	debug("sumXor( ", data, index, steps, " )", debuglevel=4)
+	debug("sumXor( ", data, index, steps, " )", debuglevel=5)
 	sum_xor = 0
 	last = min(index+steps, data.size)
 	for i in range( index, last, 4):
@@ -39,8 +41,8 @@ cdef int sumXor( np.ndarray data, int index=0, int steps=500 ):
 	return sum_xor
 
 
-cpdef int findIndex( np.ndarray data, int ind=0 ):
-	debug("findIndex( ", data, ind, " )", debuglevel=4)
+cpdef int findIndex( np.ndarray[np.uint8_t, ndim=1] data, int ind=0 ):
+	debug("findIndex( ", data, ind, " )", debuglevel=5)
 	indexFound = False
 	
 	while not indexFound:
@@ -48,7 +50,7 @@ cpdef int findIndex( np.ndarray data, int ind=0 ):
 			indexFound = True
 		else:
 			ind += 1
-	debug( ind , debuglevel=3)
+	debug("findIndex: ind=%d" % ind , debuglevel=4)
 	return ind
 
 #@profile
@@ -62,9 +64,9 @@ def fillDataPoints( np.ndarray[np.uint8_t, ndim=1] data, int start=0, int end=0,
 	if( end == 0 ):
 		end=data.size
 	
-	debug("fillDataPoints( ", data, start, end, " )", debuglevel=4)
+	debug("fillDataPoints( ", data, start, end, " )", debuglevel=5)
 	startIndex = findIndex( data, start )
-	debug("startIndex( ", startIndex, " )", debuglevel=3)
+	debug("startIndex = ", startIndex, debuglevel=4)
 	maxvalue = (end - startIndex)//4
 	data_r = data[startIndex:startIndex+4*maxvalue].reshape((-1,4))
 
@@ -97,6 +99,6 @@ def fillDataPoints( np.ndarray[np.uint8_t, ndim=1] data, int start=0, int end=0,
 	
 		i += 1
 
-	debug( timestamp, value, flag0, flag1, debuglevel=3 )
+	debug( timestamp, value, flag0, flag1, debuglevel=4 )
 	return timestamp, value, flag0, flag1, time_ovf_count
 
